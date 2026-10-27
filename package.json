@@ -1,0 +1,38 @@
+{
+  "name": "proxispeak-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:browser": "vite preview --port 4173 --host 0.0.0.0 &",
+    "test:browser:run": "npx playwright test",
+    "test:browser:stop": "taskkill /F /IM node.exe 2>NUL || true"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "@vitejs/plugin-react": "latest",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-router-dom": "^7.18.4",
+    "socket.io-client": "latest",
+    "three": "^0.186.1",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@testing-library/react": "^16.3.3",
+    "@vitest/coverage-v8": "^5.0.4",
+    "autoprefixer": "latest",
+    "jsdom": "^30.1.2",
+    "playwright": "^1.64.1",
+    "postcss": "latest",
+    "tailwindcss": "^3.4.17",
+    "vitest": "^5.0.4"
+  }
+}

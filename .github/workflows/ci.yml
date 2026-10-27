@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+# The backend test suite spawns real server processes on loopback ports, so jobs
+# are serialized per branch and kept to a single runner.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: server
+
+      - name: Frontend unit tests
+        run: npm run test
+
+      - name: Backend tests
+        run: npm run test
+        working-directory: server
+
+      - name: Production build
+        run: npm run build
+
+      - name: Secret scan (built bundle and tracked templates)
+        run: |
+          # The bundle must never contain a server-side secret VALUE. Beware of
+          # false positives: the UI legitimately prints the *names* of the
+          # variables in an error message (e.g. "...CLIENT_ORIGIN and
+          # SESSION_SECRET configuration"), so match assignments/values, not bare
+          # identifiers.
+          if grep -rEn "(SESSION_SECRET|TURN_SECRET|TURN_CREDENTIAL|HEALTH_TOKEN)[[:space:]]*[:=][[:space:]]*[\"'][^\"']+|proxispeak-development-only-session-secret|mongodb(\+srv)?://[^\"']*@" dist/; then
+            echo "::error::Server secret found in the built bundle"
+            exit 1
+          fi
+          echo "No server secret values found in dist/"
+
+  # Browser (Playwright) tests are documented in docs/PHASE4_TEST_MATRIX.md but
+  # are intentionally not enabled here yet: they need a running backend and the
+  # `vite preview` server in the same job. Enable them once that wiring exists.

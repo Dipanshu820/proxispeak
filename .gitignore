@@ -1,0 +1,23 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+coverage/
+
+# Environment files contain deployment secrets. Keep the examples.
+.env
+.env.*
+!.env.example
+
+# Local account store (created when MONGODB_URI is not configured)
+server/.data/
+
+# Runtime logs
+*.log
+server/tmp-prod.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

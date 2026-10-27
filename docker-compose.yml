@@ -1,0 +1,49 @@
+# Local development dependencies for ProxiSpeak.
+#
+# MongoDB is OPTIONAL for the application (presence, movement and audio work
+# without it), but the gated test suites need a real server:
+#
+#   docker compose up -d mongo
+#   cd server
+#   MONGODB_TEST_URI=mongodb://127.0.0.1:27018 npx vitest run db.live.test.js
+#   PROXISPEAK_MONGO_RECOVERY=1 npx vitest run mongo-recovery.test.js
+#
+# Port 27018 is used deliberately so this container never collides with a
+# MongoDB already installed on the default 27017.
+#
+# Free and local only: the official `mongo` image, no hosted service, no account.
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: proxispeak-mongo-dev
+    restart: unless-stopped
+    ports:
+      - '27018:27017'
+    volumes:
+      - proxispeak-mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Optional: run the office with persistence enabled against the container
+  # above. Start with `docker compose --profile app up`, then export
+  # MONGODB_URI=mongodb://127.0.0.1:27018 and `npm start` in server/.
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: proxispeak-mongo-express
+    profiles: ['tools']
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017
+      ME_CONFIG_BASICAUTH: 'false'
+    ports:
+      - '8081:8081'
+
+volumes:
+  proxispeak-mongo-data:

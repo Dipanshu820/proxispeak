@@ -1,0 +1,24 @@
+{
+  "name": "proxispeak-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "test": "vitest run",
+    "load-test": "node load-test.js",
+    "mint-session": "node mint-session.js"
+  },
+  "dependencies": {
+    "cors": "latest",
+    "express": "latest",
+    "mongodb": "^6.0.0",
+    "socket.io": "latest",
+    "socket.io-client": "^4.8.4",
+    "vitest": "^5.0.5"
+  },
+  "devDependencies": {
+    "ws": "^8.22.0"
+  }
+}
